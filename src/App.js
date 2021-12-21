@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import AddSong from "./components/AddSong";
+import Header from "./components/Header";
+import SongPlayer from "./components/SongPlayer";
+import SongList from "./components/SongList";
+import { Grid } from "@material-ui/core";
+
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <>
+      <Header/>
+      <Grid container >  { /* spacing={3}*/}
+        <Grid style={{
+          paddingTop: 80
+        }} item xs={12} md={7}>
+          <AddSong/>
+          <SongList/>
+        </Grid>
+        <Grid style={{
+          position: 'fixed',
+          width: '100%',
+          right: 0,
+          top: 70
+        }} item xs={12} md={5}>
+          <SongPlayer/>
+        </Grid>
+      </Grid>
+    </>
+  )
 }
 
 export default App;
