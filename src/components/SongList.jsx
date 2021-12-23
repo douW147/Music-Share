@@ -1,16 +1,17 @@
+import { useSubscription } from "@apollo/react-hooks";
 import { CircularProgress, Card, CardMedia, CardContent, Typography, CardActions, IconButton, makeStyles } from "@material-ui/core";
 import { PlayArrow, Save } from "@material-ui/icons";
 import React from "react";
+import { GET_SONGS } from "../graphql/subscriptions";
 
 function SongList() {
 
-    let loading = false;
-
-    const song = {
-        title: "Lune",
-        artist: "Moon",
-        thumbnail: "http://img.youtube.com/vi/--ZtUFsIgMk/0.jpg"
-    };
+    const { data, loading, error } = useSubscription(GET_SONGS);
+    // const song = {
+    //     title: "Lune",
+    //     artist: "Moon",
+    //     thumbnail: "http://img.youtube.com/vi/--ZtUFsIgMk/0.jpg"
+    // };
 
     if (loading) {
         return (
@@ -24,10 +25,15 @@ function SongList() {
             </div>
         )
     }
+    if (error) {console.log(error);
+        return <div>Error fetching songs</div>
+        
+    }
+
     return (
     <div>
-    {Array.from({ length: 10 }, () => song).map((song, i) => (
-        <Song key={i} song={song} />
+    {data.songs.map((song) => (
+        <Song key={song.id} song={song} />
     ))}
     </div>
     );

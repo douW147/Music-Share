@@ -1,4 +1,4 @@
-import { Avatar, IconButton, Typography, makeStyles } from "@material-ui/core";
+import { Avatar, IconButton, Typography, makeStyles, useMediaQuery } from "@material-ui/core";
 import { Delete } from "@material-ui/icons";
 import React, { useState } from "react";
 
@@ -27,14 +27,14 @@ const useStyles = makeStyles( theme => ({
 }));
 
 function QueuedSongList() {
-
+    const isGreaterMd = useMediaQuery(theme => theme.breakpoints.up('md'));
     const song = {
         title: "Lune",
         artist: "Moon",
         thumbnail: "http://img.youtube.com/vi/--ZtUFsIgMk/0.jpg"
     };
 
-    return (
+    return ( isGreaterMd &&
         <div style={{margin: '10px 0'}}>
             <Typography color='textSecondary' variant="button">
                 QUEUE (5)
