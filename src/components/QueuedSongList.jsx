@@ -1,6 +1,8 @@
+import { useMutation } from "@apollo/react-hooks";
 import { Avatar, IconButton, Typography, makeStyles, useMediaQuery } from "@material-ui/core";
 import { Delete } from "@material-ui/icons";
 import React, { useState } from "react";
+import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutations";
 
 
 const useStyles = makeStyles( theme => ({
@@ -26,20 +28,19 @@ const useStyles = makeStyles( theme => ({
     }
 }));
 
-function QueuedSongList() {
+function QueuedSongList( {queue} ) {
     const isGreaterMd = useMediaQuery(theme => theme.breakpoints.up('md'));
     const song = {
         title: "Lune",
         artist: "Moon",
         thumbnail: "http://img.youtube.com/vi/--ZtUFsIgMk/0.jpg"
     };
-
     return ( isGreaterMd &&
         <div style={{margin: '10px 0'}}>
             <Typography color='textSecondary' variant="button">
-                QUEUE (5)
+                QUEUE ({queue.length})
             </Typography>
-            {Array.from({ length: 5 }, () => song).map((song, i) => (
+            {queue.map((song, i) => (
                 <QueuedSong key={i} song={song} />
             ))}
         </div>
@@ -49,6 +50,17 @@ function QueuedSongList() {
 function QueuedSong(props) {
     const classes = useStyles();
     const {thumbnail, artist, title} = props.song;
+    const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE,{
+        onCompleted: data => {
+            localStorage.setItem('queue', JSON.stringify(data.addOrRemoveFromQueue))
+        }
+    });
+    function handleAddOrRemoveFromQueue() {
+        addOrRemoveFromQueue({
+            variables: { input: { ...props.song, __typename: "Song" }}
+        });
+        console.log("eheh");
+    }
     return (
     <div className={classes.container}>
         <Avatar src={thumbnail} alt="Song thumbnail" className={classes.avatar}/>
@@ -60,7 +72,7 @@ function QueuedSong(props) {
                 {artist}
             </Typography>
         </div>
-        <IconButton>
+        <IconButton onClick={handleAddOrRemoveFromQueue}>
             <Delete color="error"/>
         </IconButton>
     </div>

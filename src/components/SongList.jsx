@@ -1,11 +1,12 @@
-import { useSubscription } from "@apollo/react-hooks";
+import { useMutation, useSubscription } from "@apollo/react-hooks";
 import { CircularProgress, Card, CardMedia, CardContent, Typography, CardActions, IconButton, makeStyles } from "@material-ui/core";
-import { PlayArrow, Save } from "@material-ui/icons";
+import { Pause, PlayArrow, Save } from "@material-ui/icons";
 import React from "react";
+import { SongContext } from "../App";
+import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutations";
 import { GET_SONGS } from "../graphql/subscriptions";
 
 function SongList() {
-
     const { data, loading, error } = useSubscription(GET_SONGS);
     // const song = {
     //     title: "Lune",
@@ -60,8 +61,32 @@ const useStyles = makeStyles(theme => ({
 }))
 
 function Song({ song }) {
+    const { state, dispatch } = React.useContext(SongContext);
     const classes = useStyles()
-    const { title, thumbnail, artist } = song;
+    const { title, thumbnail, artist, id } = song;
+    const [isCurrentSongPlaying, setIsCurrentSongPlaying] = React.useState(false);
+    const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
+        onCompleted: data => {
+            localStorage.setItem('queue', JSON.stringify(data.addOrRemoveFromQueue))
+        }
+    });
+    React.useEffect(() => {
+        const isSongPlaying = state.isPlaying && id === state.song.id;
+        setIsCurrentSongPlaying(isSongPlaying);
+    }, [id, state.song.id, state.isPlaying])
+
+    function handleSongPlay() {
+        dispatch({ type: "SET_SONG", payload: { song }})
+        dispatch(state.isPlaying ? {type: "PAUSE_SONG"} : {type: "PLAY_SONG"})
+    }
+
+    function handleAddOrRemoveFromQueue() {
+        addOrRemoveFromQueue({
+            variables: { input: { ...song, __typename: "Song" }}
+        });
+        console.log("eheh");
+    }
+
     return <Card className={classes.container}>
         <div className={classes.songInfoContainer}>
             <CardMedia image={thumbnail} className={classes.thumbnail}/>
@@ -75,10 +100,10 @@ function Song({ song }) {
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <IconButton size="small" color="primary">
-                        <PlayArrow/>
+                    <IconButton onClick={handleSongPlay} size="small" color="primary">
+                       {isCurrentSongPlaying ? <Pause/> : <PlayArrow/>}
                     </IconButton>
-                    <IconButton size="small" color="secondary">
+                    <IconButton onClick={handleAddOrRemoveFromQueue} size="small" color="secondary">
                         <Save/>
                     </IconButton>
                 </CardActions>
