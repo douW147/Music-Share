@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/Music-Share/static/js/main.d933384e.js",
+    "index.html": "/Music-Share/index.html",
+    "main.d933384e.js.map": "/Music-Share/static/js/main.d933384e.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.d933384e.js"
+  ]
+}
